@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   mongodbcompose:
     image: mongo:latest
     container_name: mongodb
@@ -10,22 +11,34 @@ services:
       - mongo-data:/data/db
 
   backendcompose:
-    image: ank906/backend-app:2
+    image: ank906/backend-app:latest   # replaced by Jenkins automatically
     container_name: backend
-    ports:
-      - "5000:8080"
+    expose:
+      - "8080"                         # backend is internal only
     environment:
       - NODE_ENV=production
     depends_on:
       - mongodbcompose
 
   frontendcompose:
-    image: ank906/frontend-app:2
+    image: ank906/frontend-app:latest  # replaced by Jenkins automatically
     container_name: frontend
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     depends_on:
+      - backendcompose
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"                        # ONLY NGINX EXPOSES PORT 80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontendcompose
       - backendcompose
 
 volumes:
   mongo-data:
+
