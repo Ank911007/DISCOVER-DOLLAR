@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodbcompose:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backendcompose:
+    image: ank906/my-backend:v2
+    container_name: backend
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - mongodbcompose
+
+  frontendcompose:
+    image: ank906/my-frontend:v2
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backendcompose
+
+volumes:
+  mongo-data:
